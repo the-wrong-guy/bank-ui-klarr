@@ -178,7 +178,7 @@ function BankTable({ rows, favBankRows }) {
                       <TableCell align="center">{row.bank_id}</TableCell>
                       <TableCell align="center">
                         <span style={{display:"block"}}>{row.bank_name}</span>
-                        <Tooltip  title="Mark Favorite"> 
+                        <Tooltip  title="Add to your Favorites"> 
                         <IconButton
                         onClick={() => handleSetFav(row)}
                         size="small">
