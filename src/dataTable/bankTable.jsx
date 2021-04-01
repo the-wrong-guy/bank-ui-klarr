@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { IconButton,Tooltip } from "@material-ui/core";
+import Alert from '@material-ui/lab/Alert';
+import Snackbar from '@material-ui/core/Snackbar';
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -51,6 +53,8 @@ function BankTable({ rows, favBankRows }) {
   const [dense, setDense] = useState(true);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [pageAlive, setPageAlive] = useState(false);
+  const [addFavErr,setAddFavErr] = useState(false)
+  const [addFavSuccess,setAddFavSuccess] = useState(false)
   
 
   useEffect(() => {
@@ -60,6 +64,14 @@ function BankTable({ rows, favBankRows }) {
     };
     return unsub;
   }, [rows]);
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setAddFavErr(false);
+  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -74,18 +86,28 @@ function BankTable({ rows, favBankRows }) {
     setDense(event.target.checked);
   };
   const handleSetFav = (rowSingleData) => {
+   
     if (rowSingleData) {
-        let arr = []
-        const seen = new Set();
-         arr = JSON.parse(localStorage.getItem(rowSingleData.city)) || [];
-         arr.push(rowSingleData)
-         const filteredArr = arr.filter(el => {
-          const duplicate = seen.has(el.ifsc);
-          seen.add(el.ifsc);
-          return !duplicate;
-        });
-         localStorage.setItem(rowSingleData.city, JSON.stringify(filteredArr))
-         dispatch(setFavBanks(filteredArr))
+      let arr = []
+      arr = JSON.parse(localStorage.getItem(rowSingleData.city)) || [];
+      const duplicate = arr.some(code => code.ifsc === rowSingleData.ifsc)
+      if(!duplicate){
+        arr.push(rowSingleData)
+        localStorage.setItem(rowSingleData.city, JSON.stringify(arr))
+        dispatch(setFavBanks(arr))
+        setAddFavErr(false)
+        setAddFavSuccess(true)
+        setTimeout(()=>{
+          setAddFavSuccess(false)
+        },3000)
+      }else{
+        setAddFavSuccess(false)
+        setAddFavErr(true)
+        setTimeout(()=>{
+          setAddFavErr(false)
+        },3000)
+        return
+      }     
     }
   };
   const emptyRows =
@@ -93,6 +115,24 @@ function BankTable({ rows, favBankRows }) {
 
   return (
     <div className={classes.root}>
+      <Snackbar
+        anchorOrigin={{ vertical: 'top',
+        horizontal: 'center', }}
+        open={addFavErr}
+        onClose={handleClose}
+        autoHideDuration={3000}
+      >
+        <Alert onClose={handleClose} severity="warning">Already added to your Favourites!</Alert>
+      </Snackbar>
+      <Snackbar
+        anchorOrigin={{ vertical: 'top',
+        horizontal: 'center', }}
+        open={addFavSuccess}
+        onClose={handleClose}
+        autoHideDuration={3000}
+      >
+        <Alert onClose={handleClose} sseverity="success">Added to your Favourites!</Alert>
+      </Snackbar>
       <Paper elevation={5} className={classes.paper}>
         <TableContainer component={Paper}>
           <Table
