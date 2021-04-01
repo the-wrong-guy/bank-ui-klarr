@@ -32,6 +32,7 @@ function App() {
       dispatch(setFavBanks(data))
     }
     fetchData()
+    window.addEventListener('storage',()=>{ fetchData()})
     return fetchData
   }, [qCity])
 
