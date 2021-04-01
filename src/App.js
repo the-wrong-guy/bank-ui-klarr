@@ -113,7 +113,7 @@ function App() {
               outline: "none",
               border: "none",
               borderRadius: "100px",
-              padding: "7px 14px",
+              padding: "7px 19px",
               fontSize: "1rem"
             }}
             small
